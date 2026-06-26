@@ -96,7 +96,16 @@ Get-TolAIToSolve -Skillset "senior front-end designer" -Data $stats -MaxTokens 4
 $rows = Import-Csv .\sales.csv
 Get-TolAIToSolve -Skillset "data analyst" -Data $rows `
     -Prompt "Give me the top 3 takeaways from this sales data."
+
+# Anonymize personal data in a message, as a GDPR officer (local Ollama, see note)
+$clean = Get-TolAIToSolve -Provider Ollama -Skillset "GDPR / data-privacy officer" -Data $message `
+    -Prompt "Anonymize all personal data: names, emails, phone numbers, addresses, national IDs. Return only the cleaned text."
 ```
+
+> 🔒 **Privacy note for the anonymization case:** if you send personal data to a
+> *cloud* provider to clean it, the original data has already left your machine and
+> reached that provider. To anonymize genuinely sensitive content, use the **local
+> Ollama** provider (`-Provider Ollama`), as shown above, so nothing leaves your box.
 
 > ℹ️ For long output like a full HTML report, raise `-MaxTokens` (e.g. `4096`) or the
 > answer gets cut off. Asking for "only the HTML, no code fences" gives you a file you

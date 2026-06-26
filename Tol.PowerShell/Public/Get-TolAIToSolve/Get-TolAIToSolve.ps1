@@ -79,6 +79,11 @@ function Get-TolAIToSolve {
             -Prompt "Build a clean, modern HTML report from this data. Return only the HTML, no code fences." |
             Out-File report.html
 
+    .EXAMPLE
+        # Anonymize personal data locally (use Ollama so the data never leaves the box)
+        $clean = Get-TolAIToSolve -Provider Ollama -Skillset "GDPR / data-privacy officer" -Data $message `
+            -Prompt "Anonymize all personal data: names, emails, phone numbers, addresses, IDs. Return only the cleaned text."
+
     .NOTES
         DEFAULT MODELS (override with -Model; update as providers release newer ones):
           Claude   -> claude-opus-4-8
