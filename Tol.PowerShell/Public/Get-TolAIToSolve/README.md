@@ -111,6 +111,35 @@ $clean = Get-TolAIToSolve -Provider Ollama -Skillset "GDPR / data-privacy office
 > answer gets cut off. Asking for "only the HTML, no code fences" gives you a file you
 > can save and open directly.
 
+### Large inputs (Claude's 1M-token context)
+
+The default Claude model, `claude-opus-4-8`, has a **1 million token context window**,
+so you can feed it very large inputs in one go: a whole log file, a long contract, an
+entire export. No chunking needed.
+
+```powershell
+# Feed an entire log file and find the root cause (1M context swallows it whole)
+$log = Get-Content .\app.log -Raw
+Get-TolAIToSolve -Provider Claude -Skillset "site reliability engineer" -Data $log -MaxTokens 2048 `
+    -Prompt "Find the root cause of the errors in this log and list the timestamps involved."
+
+# Summarize a long document
+$doc = Get-Content .\contract.txt -Raw
+Get-TolAIToSolve -Skillset "contract lawyer" -Data $doc -MaxTokens 2048 `
+    -Prompt "Summarize the key obligations and flag anything unusual or risky."
+
+# Review a large data export as a whole
+$export = Import-Csv .\customers_full.csv
+Get-TolAIToSolve -Skillset "data quality analyst" -Data $export -MaxTokens 2048 `
+    -Prompt "Find duplicate or inconsistent records and describe the patterns you see."
+```
+
+> ℹ️ The 1M limit is the **input/context** side. `-MaxTokens` still caps the *answer*
+> length. Because this command uses non-streaming REST, keep `-MaxTokens` to roughly
+> 16K or below to avoid HTTP timeouts on very long answers (big *input* is fine; it is
+> large *output* that times out). 1M-context Opus is the most capable and the priciest
+> model, so watch cost when looping over many large inputs.
+
 ## Parameters
 
 | Parameter | Type | Default | Description |
