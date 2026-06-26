@@ -138,6 +138,11 @@ providers release newer ones.
 | Mistral  | `mistral-large-latest` |
 | Ollama   | `llama3.2` |
 
+The Claude default, `claude-opus-4-8`, has a **1M-token context window**, so you can
+feed large `-Data` without trimming it. Remember `-MaxTokens` caps only the *answer*
+length (the 1M is the input side). 1M-context Opus is also the most capable and the
+priciest option, so watch cost in loops.
+
 ## Return value
 
 - Without `-AsJson`: the answer as a **string**.
