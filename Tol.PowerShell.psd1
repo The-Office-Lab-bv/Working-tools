@@ -18,7 +18,8 @@
         'Find-TolDuplicateFile',
         'Merge-TolCsv',
         'Test-TolEndpoint',
-        'Write-TolLog'
+        'Write-TolLog',
+        'Get-TolAIToSolve'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()

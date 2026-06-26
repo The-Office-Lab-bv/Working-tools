@@ -19,5 +19,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   - `Merge-TolCsv` - combine many CSV files into one.
   - `Test-TolEndpoint` - ping and TCP port check for a list of hosts.
   - `Write-TolLog` - timestamped, leveled logging to console and file.
+  - `Get-TolAIToSolve` - query Claude, ChatGPT, Gemini, Mistral/Le Chat, or local Ollama.
 - Standalone `StayAwake.ps1` at the repo root for no-install use.
 - Project docs: README, SECURITY, CONTRIBUTING, and issue/PR templates.

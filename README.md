@@ -26,6 +26,7 @@ Each tool lives in its own folder under [`tools/`](tools/) with a focused how-to
 | [`Merge-TolCsv`](tools/Merge-TolCsv) | Cross-platform | Combines many CSV files into one. |
 | [`Test-TolEndpoint`](tools/Test-TolEndpoint) | Cross-platform | Ping + TCP port check for a list of hosts. |
 | [`Write-TolLog`](tools/Write-TolLog) | Cross-platform | Timestamped, leveled logging to console and file. |
+| [`Get-TolAIToSolve`](tools/Get-TolAIToSolve) | Cross-platform | Ask Claude, ChatGPT, Gemini, Mistral, or local Ollama. Cloud APIs cost money. |
 
 Every command also has full built-in help: `Get-Help Start-TolStayAwake -Full`.
 
@@ -73,6 +74,7 @@ Find-TolDuplicateFile -Path C:\Users\me\Pictures
 Merge-TolCsv -Path .\exports -OutFile .\all.csv -AddSourceColumn
 Test-TolEndpoint -ComputerName server01, 8.8.8.8 -Port 80, 443
 Write-TolLog "Job done" -Level Success -Path .\logs\run.log
+Get-TolAIToSolve -Provider Ollama "Explain DNS in one sentence."   # cloud providers cost money
 ```
 
 See each tool's folder for the full how-to and parameters.
