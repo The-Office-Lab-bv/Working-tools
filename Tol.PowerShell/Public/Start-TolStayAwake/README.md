@@ -40,5 +40,4 @@ until you press Ctrl+C.
 
 ## Notes
 
-Windows only. A standalone, no-install copy lives at the repo root as
-[`StayAwake.ps1`](../../StayAwake.ps1).
+Windows only.

@@ -19,7 +19,8 @@
         'Merge-TolCsv',
         'Test-TolEndpoint',
         'Write-TolLog',
-        'Get-TolAIToSolve'
+        'Get-TolAIToSolve',
+        'Get-TolSystemInfo'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()

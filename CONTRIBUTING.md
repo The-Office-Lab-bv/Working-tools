@@ -7,10 +7,10 @@ each one should do one useful thing well and be easy to read.
 
 1. **Pick a name** using an approved PowerShell verb and the `Tol` noun prefix, for
    example `Get-TolSomething`. Check approved verbs with `Get-Verb`.
-2. **Create a folder** under `tools/` named after the command, e.g.
-   `tools/Get-TolSomething/`.
-3. **Add the function** in `tools/Get-TolSomething/Get-TolSomething.ps1` as a single
-   advanced function:
+2. **Create a folder** under `Tol.PowerShell/Public/` named after the command, e.g.
+   `Tol.PowerShell/Public/Get-TolSomething/`.
+3. **Add the function** in `Tol.PowerShell/Public/Get-TolSomething/Get-TolSomething.ps1`
+   as a single advanced function:
    ```powershell
    function Get-TolSomething {
        [CmdletBinding()]
@@ -21,12 +21,12 @@ each one should do one useful thing well and be easy to read.
    ```
 4. **Add a `README.md`** in the same folder: what it does, why, usage, parameters.
 5. **Export it**: add the command name to `FunctionsToExport` in
-   `Tol.PowerShell.psd1`.
-6. **Link it** from the tool table in the root `README.md`.
+   `Tol.PowerShell/Tol.PowerShell.psd1`.
+6. **Link it** from the command table in the root `README.md`.
 7. **Update** `CHANGELOG.md`.
 
-Shared helpers that are not meant to be called directly go in `private/` and are not
-exported.
+Shared helpers that are not meant to be called directly go in `Tol.PowerShell/Private/`
+and are not exported.
 
 ## Style
 
@@ -42,7 +42,7 @@ Before opening a pull request:
 
 ```powershell
 # It imports cleanly with no warnings
-Import-Module ./Tol.PowerShell.psd1 -Force
+Import-Module ./Tol.PowerShell/Tol.PowerShell.psd1 -Force
 
 # Each file parses
 Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
