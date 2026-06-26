@@ -4,9 +4,12 @@ function Get-TolAIToSolve {
         Sends a prompt to an AI provider of your choice and returns the answer.
 
     .DESCRIPTION
-        One command, four providers. Pick the model family with -Provider (Claude,
-        ChatGPT, Gemini, or Mistral/LeChat), pass your question with -Prompt, and get
-        the answer back as text. Use -AsJson to ask for and parse a JSON object.
+        One command, five providers. Pick the model family with -Provider (Claude,
+        ChatGPT, Gemini, Mistral/LeChat, or local Ollama) and give it three things:
+          -Prompt   what to do      (the instruction)
+          -Data     what to work on (any variable; objects are JSON-encoded for you)
+          -Skillset who should do it (the expertise the AI applies)
+        You get the answer back as text. Use -AsJson to ask for and parse a JSON object.
 
         Each provider needs an API key. By default the key is read from an environment
         variable (see the table below); you can also pass one with -ApiKey.
@@ -36,14 +39,27 @@ function Get-TolAIToSolve {
     .PARAMETER ApiKey
         The API key. If omitted, it is read from the provider's environment variable.
 
+    .PARAMETER Skillset
+        The expertise you want the AI to apply, in plain words, e.g. "senior front-end
+        designer", "financial analyst", "Belgian VAT accountant". It becomes the AI's
+        role so the answer comes from that angle. The three building blocks are:
+        Prompt = what to do, Data = what to work on, Skillset = who should do it.
+
     .PARAMETER System
-        Optional system prompt / instruction that frames how the AI should answer.
+        Advanced: a raw system prompt, for full control over the AI's instructions. If
+        you also pass -Skillset, both are combined. Most people only need -Skillset.
+
+    .PARAMETER Data
+        Data to give the AI alongside the prompt. Accepts any object: strings are sent
+        as-is, anything else (arrays, hashtables, objects from Get-* commands) is turned
+        into JSON automatically. The prompt is your instruction, the data is the input.
 
     .PARAMETER AsJson
         Ask the AI for JSON and return it as a parsed PowerShell object instead of text.
 
     .PARAMETER MaxTokens
-        Maximum length of the answer, in tokens. Default 1024.
+        Maximum length of the answer, in tokens. Default 1024. Raise it for long output
+        such as a full HTML report (e.g. -MaxTokens 4096), or it will be cut off.
 
     .EXAMPLE
         Get-TolAIToSolve "Explain DNS in one sentence."
@@ -55,6 +71,13 @@ function Get-TolAIToSolve {
         $obj = Get-TolAIToSolve -Provider Gemini -AsJson `
             -Prompt "Give me name and capital for 3 EU countries as JSON."
         $obj.countries
+
+    .EXAMPLE
+        # Prompt + Data + Skillset: turn a variable into a designed HTML report
+        $stats = Get-TolFolderSize -Path C:\Logs
+        Get-TolAIToSolve -Skillset "senior front-end designer" -Data $stats -MaxTokens 4096 `
+            -Prompt "Build a clean, modern HTML report from this data. Return only the HTML, no code fences." |
+            Out-File report.html
 
     .NOTES
         DEFAULT MODELS (override with -Model; update as providers release newer ones):
@@ -78,7 +101,9 @@ function Get-TolAIToSolve {
         [string]$Provider = 'Claude',
         [string]$Model,
         [string]$ApiKey,
+        [string]$Skillset,
         [string]$System,
+        [object]$Data,
         [switch]$AsJson,
         [int]$MaxTokens = 1024
     )
@@ -105,7 +130,18 @@ function Get-TolAIToSolve {
         }
     }
     process {
+        # Build the effective system prompt from Skillset (friendly) + System (raw).
+        $sys = $System
+        if ($Skillset) {
+            $role = "You are an expert $Skillset. Apply that expertise to the task."
+            $sys = if ($System) { "$role`n$System" } else { $role }
+        }
+
         $userText = $Prompt
+        if ($PSBoundParameters.ContainsKey('Data') -and $null -ne $Data) {
+            $dataText = if ($Data -is [string]) { $Data } else { $Data | ConvertTo-Json -Depth 10 }
+            $userText += "`n`n--- DATA ---`n$dataText"
+        }
         if ($AsJson) {
             $userText += "`n`nRespond with valid JSON only. No markdown, no code fences, no commentary."
         }
@@ -118,7 +154,7 @@ function Get-TolAIToSolve {
                         max_tokens = $MaxTokens
                         messages   = @(@{ role = 'user'; content = $userText })
                     }
-                    if ($System) { $body.system = $System }
+                    if ($sys) { $body.system = $sys }
                     $resp = Invoke-RestMethod -Method Post -Uri 'https://api.anthropic.com/v1/messages' `
                         -Headers @{
                             'x-api-key'         = $ApiKey
@@ -131,7 +167,7 @@ function Get-TolAIToSolve {
                     $base = [Environment]::GetEnvironmentVariable('OLLAMA_HOST')
                     if (-not $base) { $base = 'http://localhost:11434' }
                     $messages = @()
-                    if ($System) { $messages += @{ role = 'system'; content = $System } }
+                    if ($sys) { $messages += @{ role = 'system'; content = $sys } }
                     $messages += @{ role = 'user'; content = $userText }
                     $body = [ordered]@{
                         model    = $Model
@@ -148,7 +184,7 @@ function Get-TolAIToSolve {
                     $body = [ordered]@{
                         contents = @(@{ parts = @(@{ text = $userText }) })
                     }
-                    if ($System)  { $body.system_instruction = @{ parts = @(@{ text = $System }) } }
+                    if ($sys)  { $body.system_instruction = @{ parts = @(@{ text = $sys }) } }
                     if ($AsJson)  { $body.generationConfig = @{ response_mime_type = 'application/json' } }
                     $uri = "https://generativelanguage.googleapis.com/v1beta/models/$Model:generateContent"
                     $resp = Invoke-RestMethod -Method Post -Uri $uri `
@@ -164,7 +200,7 @@ function Get-TolAIToSolve {
                         'https://api.mistral.ai/v1/chat/completions'
                     }
                     $messages = @()
-                    if ($System) { $messages += @{ role = 'system'; content = $System } }
+                    if ($sys) { $messages += @{ role = 'system'; content = $sys } }
                     $messages += @{ role = 'user'; content = $userText }
                     $body = [ordered]@{
                         model      = $Model

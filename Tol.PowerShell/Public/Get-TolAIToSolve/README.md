@@ -72,17 +72,49 @@ Get-TolAIToSolve -Prompt "What is a vector database?" -System "Answer like a tea
 "What is the speed of light in km/s?" | Get-TolAIToSolve
 ```
 
+### Prompt + Data + Skillset
+
+Think of every call as three building blocks:
+
+| Block | Parameter | What it is |
+|-------|-----------|------------|
+| **What to do** | `-Prompt` | The instruction. |
+| **What to work on** | `-Data` | Any variable. Strings go in as-is; objects, arrays, and hashtables are turned into JSON for you. |
+| **Who should do it** | `-Skillset` | The expertise the AI applies, in plain words ("senior front-end designer", "VAT accountant"). |
+
+That lets you hand the AI a variable of data and have it produce something polished,
+like a designed HTML report:
+
+```powershell
+# Build a modern HTML report from a variable, as a front-end designer would
+$stats = Get-TolFolderSize -Path C:\Logs
+Get-TolAIToSolve -Skillset "senior front-end designer" -Data $stats -MaxTokens 4096 `
+    -Prompt "Build a clean, modern HTML report from this data. Return only the HTML, no code fences." |
+    Out-File report.html
+
+# Summarize a CSV you already loaded, as a data analyst
+$rows = Import-Csv .\sales.csv
+Get-TolAIToSolve -Skillset "data analyst" -Data $rows `
+    -Prompt "Give me the top 3 takeaways from this sales data."
+```
+
+> ℹ️ For long output like a full HTML report, raise `-MaxTokens` (e.g. `4096`) or the
+> answer gets cut off. Asking for "only the HTML, no code fences" gives you a file you
+> can save and open directly.
+
 ## Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `-Prompt` | string | required | The question or task. Accepts pipeline input. |
+| `-Prompt` | string | required | The instruction (what to do). Accepts pipeline input. |
+| `-Data` | object | none | The input to work on (any variable; objects become JSON). |
+| `-Skillset` | string | none | The expertise the AI should apply (who should do it). |
 | `-Provider` | string | `Claude` | `Claude`, `ChatGPT`, `Gemini`, `Mistral`, `LeChat`, or `Ollama`. |
 | `-Model` | string | per provider | Override the model (see default models below). |
 | `-ApiKey` | string | from env var | The API key; falls back to the provider's environment variable. |
-| `-System` | string | none | A system prompt to frame how the AI answers. |
+| `-System` | string | none | Advanced: a raw system prompt. Combined with `-Skillset` if both are given. |
 | `-AsJson` | switch | off | Ask for JSON and return it as a parsed object. |
-| `-MaxTokens` | int | `1024` | Maximum answer length, in tokens. |
+| `-MaxTokens` | int | `1024` | Maximum answer length, in tokens. Raise it for long output (reports). |
 
 ### Default models
 
