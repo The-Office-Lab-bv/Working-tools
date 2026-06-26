@@ -17,7 +17,8 @@
         'Get-TolPublicIP',
         'Find-TolDuplicateFile',
         'Merge-TolCsv',
-        'Test-TolEndpoint'
+        'Test-TolEndpoint',
+        'Write-TolLog'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
