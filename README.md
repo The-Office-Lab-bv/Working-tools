@@ -122,6 +122,14 @@ Working-tools/
 - New tools: see [CONTRIBUTING.md](CONTRIBUTING.md).
 - Reporting a vulnerability: see [SECURITY.md](SECURITY.md).
 
+## Support
+
+If these tools save you time, you can say thanks:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-The%20Office%20Lab-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/theofficelab)
+
+☕ [buymeacoffee.com/theofficelab](https://buymeacoffee.com/theofficelab)
+
 ## License
 
 [MIT](LICENSE) (c) The Office Lab BV. Use freely, no warranty.
