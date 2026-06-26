@@ -17,7 +17,7 @@ Please report security issues privately, not in a public issue.
 1. Preferred: open a private report through GitHub's
    **Security > Report a vulnerability** (private vulnerability reporting) on this
    repository.
-2. Or email **dave.vangool@theofficelab.eu** with the details.
+2. Or email **security@theofficelab.eu** with the details.
 
 Please include:
 
